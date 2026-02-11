@@ -11,7 +11,7 @@ tools_name = {'EFCLGR'};
 base_data_path = 'D:\Matlab\DM\data\data\';
 base_result_path = 'D:\Matlab\DM\LPPFCM\EFCLGR\result\';
 
-%% Parameter Grid Definition
+% Parameter Grid Definition
 % Hyperparameter search space for EFCLGR algorithm
 sigma_vals = [0.1, 1, 10];      % Gaussian kernel bandwidth parameters
 lambda_vals = [0.1, 1, 10];     % Regularization parameter (corrected spelling from 'lamda')
@@ -21,7 +21,7 @@ mu_vals = 100;                  % Penalty parameter for ALM
 rho_vals = 1.01;                % Augmented Lagrangian multiplier update rate
 n_iterations = 100;              % Number 
 
-%% Main Processing Loop
+% Main Processing Loop
 for ds = 1:length(datasets_name)
     dataset = datasets_name{ds};
     file = fullfile(base_data_path, [dataset, '.mat']);
@@ -34,7 +34,7 @@ for ds = 1:length(datasets_name)
     
     load(file);  % Load dataset variables (X: features, Y: labels)
     
-    %% Preprocessing: PCA Dimensionality Reduction
+    % Preprocessing: PCA Dimensionality Reduction
     % Apply PCA once before the dimension loop to avoid redundant computation
     if size(X, 2) > 100
         X = double(X);  % Ensure double precision for numerical stability
@@ -48,7 +48,7 @@ for ds = 1:length(datasets_name)
     step = 10;          % Step size for dimension increment
     end_dim = 100;      % Maximum dimension to evaluate
     
-    %% Tool Selection Loop
+    % Tool Selection Loop
     for drt = 1:length(tools_name)
         tool = tools_name{drt};
         filename = fullfile(base_result_path, sprintf('%s_%s.xlsx', dataset, tool));
@@ -61,23 +61,23 @@ for ds = 1:length(datasets_name)
         class = length(unique(Y));  % Number of clusters (classes)
         result = [];                % Initialize results accumulator
         
-        %% Dimension Sweep Loop
+        % Dimension Sweep Loop
         for dim = strat_dim:step:end_dim
             fprintf('Processing dim = %d\n', dim);
             
             if strcmp(tool, "EFCLGR")
-                %% Sigma Loop: Precompute Laplacian matrices
+                % Sigma Loop: Precompute Laplacian matrices
                 % L: Graph Laplacian, C: Constraint matrix
                 for sigma = sigma_vals
                     [L, C] = compute_L(data, sigma);  % Expensive operation, done per sigma
                     
-                    %% Vectorized Parameter Combination
+                    % Vectorized Parameter Combination
                     % Generate all combinations of hyperparameters using Cartesian product
                     % This replaces 4 nested loops with a single matrix operation
                     param_grid = combvec(lambda_vals, gamma_vals, theta_vals, mu_vals, rho_vals)';
                     n_comb = size(param_grid, 1);
                     
-                    %% Hyperparameter Grid Search
+                    % Hyperparameter Grid Search
                     for i = 1:n_comb
                         lambda = param_grid(i, 1);
                         gamma = param_grid(i, 2);
@@ -90,7 +90,7 @@ for ds = 1:length(datasets_name)
                         NMIs = zeros(n_iterations, 1);      % Normalized Mutual Information
                         PURITYs = zeros(n_iterations, 1);   % Clustering purity scores
                         
-                        %% Monte Carlo Simulation
+                        % Monte Carlo Simulation
                         % Run multiple iterations to account for algorithm randomness
                         for a = 1:n_iterations
                             % Execute EFCLGR clustering algorithm
@@ -118,7 +118,7 @@ for ds = 1:length(datasets_name)
             end
         end
         
-        %% Result Persistence
+        % Result Persistence
         % Write results to Excel file if any computations were performed
         if ~isempty(result)
             writematrix(result, filename);
@@ -126,7 +126,7 @@ for ds = 1:length(datasets_name)
     end
 end
 
-%% Utility Functions
+% Utility Functions
 
 function [mean_measure, std_measure] = ud_measure(ACC, MIhat, Purity)
 % UD_MEASURE Calculate mean and standard deviation of clustering metrics
@@ -200,4 +200,3 @@ function [mean_measure, std_measure] = new_measure(data, class, target, num_coun
     mean_measure = mean(measure, 1);
     std_measure = std(measure, 0, 1);
 end
-
