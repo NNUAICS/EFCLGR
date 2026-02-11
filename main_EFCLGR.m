@@ -2,7 +2,7 @@ clc;
 clear;
 warning('off');
 
-%% Configuration Section
+% Configuration Section
 % Dataset and tool configuration
 datasets_name = {'isolet_uni'};
 tools_name = {'EFCLGR'};
@@ -200,3 +200,4 @@ function [mean_measure, std_measure] = new_measure(data, class, target, num_coun
     mean_measure = mean(measure, 1);
     std_measure = std(measure, 0, 1);
 end
+
