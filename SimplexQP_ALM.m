@@ -25,13 +25,13 @@ function [U, beta, obj] = SimplexQP_ALM(H, D, n, c, mu, rho)
 %   Reference: Alternating Direction Method of Multipliers (ADMM) for
 %              convex optimization with simplex constraints
 
-%% Algorithm Parameters
-maxIter     = 500;          % Maximum number of iterations
+% Algorithm Parameters
+maxIter     = 100;          % Maximum number of iterations
 tol         = 1e-6;         % Convergence tolerance for primal residual
 patience    = 5;            % Early stopping patience (consecutive iterations below tol)
 patienceCnt = 0;            % Counter for patience-based stopping
 
-%% Initialization
+% Initialization
 sigma   = zeros(n, c);      % Dual variable (Lagrange multiplier for U = beta)
 U       = zeros(n, c);      % Primal variable with simplex constraints
 beta    = initfcm(n, c);    % Initialize beta using FCM (Fuzzy C-Means) initialization
@@ -39,16 +39,16 @@ beta    = initfcm(n, c);    % Initialize beta using FCM (Fuzzy C-Means) initiali
 % Precompute constant term for Z update
 % Z represents the linear term in the quadratic objective
 
-%% Main ADMM Iterations
+% Main ADMM Iterations
 obj = zeros(maxIter, 1);    % Store objective values for convergence analysis
 
 for iter = 1:maxIter
     
-    %%% Step 1: Update Z (auxiliary linear term)
+    %% Step 1: Update Z (auxiliary linear term)
     % Z combines the data fidelity term and the linear contribution from beta
     Z = H + D * beta;
     
-    %%% Step 2: U-update (Simplex Projection)
+    %% Step 2: U-update (Simplex Projection)
     % Solve: min_U ||U - (beta - (sigma + Z)/mu)||_F^2 
     %        s.t. U*1 = 1, U >= 0
     % This is solved via Euclidean projection onto the probability simplex
@@ -60,23 +60,23 @@ for iter = 1:maxIter
         U(i, :) = EProjSimplex(d);
     end
     
-    %%% Step 3: beta-update (Unconstrained Least Squares)
+    %% Step 3: beta-update (Unconstrained Least Squares)
     % Solve: min_beta ||D*beta - (D'*U - mu*U - sigma)||_F^2 / mu
     % Closed-form solution from first-order optimality condition
     
     beta = (-D' * U + mu * U + sigma) / mu;
     
-    %%% Step 4: Dual Variable Update (Ascent Step)
+    %% Step 4: Dual Variable Update (Ascent Step)
     % sigma_{k+1} = sigma_k + mu * (U - beta)
     % This enforces the consensus constraint U = beta
     
     sigma = sigma + mu * (U - beta);
     
-    %%% Step 5: Penalty Parameter Update
+    %% Step 5: Penalty Parameter Update
     % Increase mu to accelerate convergence (standard ALM heuristic)
     mu = rho * mu;
     
-    %%% Convergence Monitoring
+    %% Convergence Monitoring
     % Primal residual: measures constraint violation ||U - beta||_F^2
     obj(iter) = norm(U - beta, 'fro')^2;
     
