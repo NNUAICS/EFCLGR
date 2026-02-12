@@ -1,5 +1,4 @@
 function [L, C] = compute_L(X, sigma)
-% COMPUTE_L Compute graph Laplacian and covariance matrix for spectral clustering
 % This function constructs a k-nearest neighbor graph and computes the 
 % normalized graph Laplacian using Gaussian (RBF) kernel weights.
 %
@@ -11,14 +10,13 @@ function [L, C] = compute_L(X, sigma)
 %   L - Graph Laplacian matrix (n_samples x n_samples), L = D - W
 %   C - Covariance matrix (for potential downstream use in subspace learning)
 %
-% Reference: Spectral clustering based on Ng-Jordan-Weiss algorithm
     
-    %% Configuration
+    % Configuration
     k = 12;  % Number of nearest neighbors for graph construction
     
     [n_samples, n_features] = size(X);
     
-    %% Covariance Matrix Computation
+    % Covariance Matrix Computation
     % Compute covariance matrix C for potential use in discriminant analysis
     % or subspace learning (e.g., LDA, CCA extensions)
     if n_features < n_samples
@@ -33,7 +31,7 @@ function [L, C] = compute_L(X, sigma)
         C = (X * X') / n_samples;
     end
     
-    %% Graph Construction: k-Nearest Neighbor Graph
+    % Graph Construction: k-Nearest Neighbor Graph
     % Build sparse similarity graph using k-NN connectivity
     
     if n_samples < 4000
@@ -62,7 +60,7 @@ function [L, C] = compute_L(X, sigma)
         G = find_nn(X, k);  % Returns sparse distance matrix
     end
     
-    %% Gaussian Kernel (RBF) Weight Computation
+    % Gaussian Kernel (RBF) Weight Computation
     
     % Normalize squared distances to [0, 1] for numerical stability
     % This makes sigma parameter scale-invariant
@@ -79,7 +77,7 @@ function [L, C] = compute_L(X, sigma)
     
     % Result: G is now the weighted adjacency matrix W
     
-    %% Graph Laplacian Construction
+    % Graph Laplacian Construction
     
     % Compute degree matrix D (diagonal matrix of row sums)
     % D_ii = sum_j W_ij (weighted degree of node i)
@@ -90,7 +88,7 @@ function [L, C] = compute_L(X, sigma)
     % Properties: L is positive semi-definite, L*1 = 0 (constant vector is eigenvector with eigenvalue 0)
     L = D - G;
     
-    %% Numerical Stability Checks
+    % Numerical Stability Checks
     
     % Handle potential numerical issues from kernel computation
     L(isnan(L)) = 0;   % Replace NaN (from 0/0 or inf-inf operations)
