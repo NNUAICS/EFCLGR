@@ -4,12 +4,12 @@ warning('off');
 
 % Configuration Section
 % Dataset and tool configuration
-datasets_name = {'isolet_uni'};
+datasets_name = {'ORL'};
 tools_name = {'EFCLGR'};
 
 % Base paths for data and results
-base_data_path = 'D:\Matlab\DM\data\data\';
-base_result_path = 'D:\Matlab\DM\LPPFCM\EFCLGR\result\';
+base_data_path = 'D:\soft\usedata\';
+base_result_path = 'D:\LFF\11EFCLGR\result\';
 
 % Parameter Grid Definition
 % Hyperparameter search space for EFCLGR algorithm
@@ -19,7 +19,7 @@ gamma_vals = [0.1, 1, 10];      % Graph regularization weight
 theta_vals = [0.1, 1, 10];      % Constraint parameter
 mu_vals = 100;                  % Penalty parameter for ALM
 rho_vals = 1.01;                % Augmented Lagrangian multiplier update rate
-n_iterations = 100;              % Number 
+n_iterations = 100;              % Number of Monte Carlo runs for stability
 
 % Main Processing Loop
 for ds = 1:length(datasets_name)
@@ -97,7 +97,7 @@ for ds = 1:length(datasets_name)
                             U = EFCLGR(data, L, C, class, dim, lambda, gamma, theta, mu, rho);
                             
                             % Extract cluster assignments (hard clustering)
-                            [~, index] = max(U, [], 2);
+                             [max_a,index]=max(U,[],2);
                             
                             % Evaluate clustering performance against ground truth
                             [ACC, MIhat, Purity] = ClusteringMeasure(Y', index');
@@ -110,7 +110,7 @@ for ds = 1:length(datasets_name)
                         
                         % Compute mean and standard deviation across iterations
                         [mean_m, std_m] = ud_measure(ACCs, NMIs, PURITYs);
-                        
+                        mean_m
                         % Append results: [mean_metrics, std_metrics, hyperparameters, dimension]
                         result = [result; mean_m, std_m, sigma, lambda, gamma, theta, mu, rho, dim]; %#ok<AGROW>
                     end
