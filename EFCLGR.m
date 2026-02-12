@@ -1,5 +1,5 @@
 function [U] = EFCLGR(X, L, C, label, wd, lambda, gamma, theta, mu, rho)
-% 
+% LPPFCM Locality Preserving Projection-based Fuzzy C-Means Clustering
 % This function implements an iterative optimization algorithm that combines
 % Locality Preserving Projections (LPP) with Fuzzy C-Means (FCM) clustering.
 %
