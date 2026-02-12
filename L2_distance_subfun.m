@@ -22,7 +22,7 @@ function d = L2_distance_subfun(a, b)
 % Note: Returns squared distances (not square root) for efficiency
 %       Use sqrt(d) if actual Euclidean distances are needed
 
-    %% Handle edge case: 1D data
+  % Handle edge case: 1D data
     % If input is 1D (row vector), pad with zeros to enable broadcasting
     % This ensures the matrix operations work correctly for 1D cases
     if size(a, 1) == 1
@@ -30,18 +30,18 @@ function d = L2_distance_subfun(a, b)
         b = [b; zeros(1, size(b, 2))];  % Pad to 2xM
     end
     
-    %% Compute squared norms using efficient element-wise operations
+  % Compute squared norms using efficient element-wise operations
     % ||a(:,i)||^2 for each column i (1 x n vector)
     aa = sum(a .* a, 1);  % Equivalent to diag(a'*a) but much faster
     
     % ||b(:,j)||^2 for each column j (1 x p vector)
     bb = sum(b .* b, 1);  % Equivalent to diag(b'*b) but much faster
     
-    %% Compute cross term: a'*b (n x p matrix)
+  % Compute cross term: a'*b (n x p matrix)
     % ab(i,j) = a(:,i)' * b(:,j) = dot product of column i of a and column j of b
     ab = a' * b;  % Matrix multiplication: (n x m) * (m x p) = (n x p)
     
-    %% Compute squared distances using broadcasting (implicit expansion)
+  % Compute squared distances using broadcasting (implicit expansion)
     % d(i,j) = ||a(:,i)||^2 + ||b(:,j)||^2 - 2*a(:,i)'*b(:,j)
     %
     % repmat(aa', [1, size(bb,2)]) creates n x p matrix where row i is ||a(:,i)||^2
@@ -53,12 +53,12 @@ function d = L2_distance_subfun(a, b)
     % For older MATLAB versions, use explicit expansion:
     % d = repmat(aa', [1, length(bb)]) + repmat(bb, [length(aa), 1]) - 2*ab;
     
-    %% Ensure real output
+  % Ensure real output
     % Numerical errors might produce tiny imaginary parts due to floating point
     % This clamps them to zero and ensures the result is purely real
     d = real(d);
     
-    %% Numerical safeguard: clamp small negative values to zero
+  % Numerical safeguard: clamp small negative values to zero
     % Due to floating point precision, values very close to zero might be 
     % slightly negative (e.g., -1e-16). These are mathematically zero.
     d(d < 0 & d > -1e-12) = 0;
