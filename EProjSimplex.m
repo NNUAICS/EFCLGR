@@ -23,12 +23,12 @@ function [x] = EProjSimplex(v, k)
 % Algorithm: Bisection method on the dual variable (Lagrange multiplier)
 % Reference: Chen and Ye (2011), "Projection onto a simplex"
     
-    %% Input Handling
+    % Input Handling
     if nargin < 2
         k = 1;  % Default: standard probability simplex
     end
     
-    %% Initialization
+    % Initialization
     ft = 1;                     % Iteration counter for safeguard
     n = length(v);              % Dimension of the problem
     
@@ -37,7 +37,7 @@ function [x] = EProjSimplex(v, k)
     % This provides a good starting point for the bisection method
     v0 = v - mean(v) + k/n;
     
-    %% Check Feasibility of Initial Point
+    % Check Feasibility of Initial Point
     % If v0 >= 0 (all elements non-negative), then v0 is already the solution
     % because it satisfies both constraints: sum(v0) = k and v0 >= 0
     vmin = min(v0);
