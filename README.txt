@@ -8,3 +8,4 @@ Please run the code "main_EFCLGR.m" for the implemetation of the EFCLGR method.
 4.“SimplexQP_ALM” is a function required by EFCLGR, used to solve the membership matrix U.
 5.“EProjSimplex” is a function required by SimplexQP_ALM.
 6.  “ClusteringMeasure”  is a function for calculating clustering performance metrics.
+7.  "datasets.rar" is the dataset used in this study.
